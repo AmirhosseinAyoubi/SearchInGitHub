@@ -18,7 +18,7 @@ function UserName (props: any) {
 
     //get userName from route
     const router = useRouter()
-    const {query: {userName}} = router
+    const {query: {userName,page}} = router
 
     //user info
     const [userInfo, setUserInfo] = useState<any>(userInfoData)
@@ -27,12 +27,16 @@ function UserName (props: any) {
     const [repositoriesList, setRepositoriesList] = useState<Array<object>>(userRepoData)
 
 
+
     //pagination
     const [pageCount, setPageCount] = useState(Math.ceil(Number(userInfoData?.public_repos) / 6))
+    const [currentPage,setCurrentPage]=useState(Number(page))
     let limit = 10;
     const handlePageClick = async (data: any) => {
-        let currentPage = data.selected + 1
-        router.push(`/profile/${userName}?page=${currentPage}`)
+        setCurrentPage(data.selected + 1)
+        router.push(`/profile/${userName}?page=${data.selected + 1}`)
+        setRepositoriesList([])
+
     };
 
     // sort table handler
@@ -44,8 +48,7 @@ function UserName (props: any) {
 
     useEffect(()=> {
         setRepositoriesList(userRepoData)
-        setPageCount(Math.ceil(Number(userInfoData?.public_repos) / 6))
-    }, [userRepoData])
+    }, [page])
 
     // error handler
     useEffect(()=> {
@@ -154,10 +157,11 @@ function UserName (props: any) {
                 </Flex>
                 <Box mt={"60px"}>
                     <Text fontSize={{base:"16px",sm:"20px"}}>Repositories</Text>
-                    <Box mt={"20px"} gridTemplateColumns={"1fr 1fr"} borderWidth={1}
-                         borderColor={"rgba(131,128,131,0.73)"} borderRadius={8}>
+                    {repositoriesList?.length>0?
+                        <Box mt={"20px"} borderWidth={1}
+                          borderColor={"rgba(131,128,131,0.73)"} borderRadius={8}>
                         <Grid gridTemplateColumns={"1fr 1fr"}>
-                            <GridItem minH={"48px"} p={{md:5,base:3}} borderBottomWidth={1}
+                            <GridItem minH={"48px"} p={{md: 5, base: 3}} borderBottomWidth={1}
                                       borderColor={"rgba(131,128,131,0.73)"}
                                       background={"rgba(121,118,121,0.73)"}
                                       borderRight={"1px solid rgba(131,128,131,0.73) "}>
@@ -169,7 +173,7 @@ function UserName (props: any) {
 
 
                             </GridItem>
-                            <GridItem minH={"48px"} p={{md:5,base:3}} borderBottomWidth={1}
+                            <GridItem minH={"48px"} p={{md: 5, base: 3}} borderBottomWidth={1}
                                       borderColor={"rgba(131,128,131,0.73)"}
                                       background={"rgba(121,118,121,0.73)"}>
                                 column2
@@ -180,13 +184,13 @@ function UserName (props: any) {
                             {
                                 repositoriesList?.map((item: any, index: number) => {
                                     return (
-                                        <GridItem minH={"48px"} p={{md:5,base:2}}  borderBottomWidth={1}
+                                        <GridItem minH={"48px"} p={{md: 5, base: 2}} borderBottomWidth={1}
                                                   key={item?.id}
                                                   borderColor={"rgba(131,128,131,0.73)"}
                                                   borderRight={index % 2 == 0 ? "1px solid rgba(131,128,131,0.73) " : undefined}>
-                                            <Flex justifyContent={"space-between"} fontSize={{md:18,base:14}} >
+                                            <Flex justifyContent={"space-between"} fontSize={{md: 18, base: 14}}>
                                                 {item?.name}
-                                                <Text fontSize={{md:12,base:10}} ml={5}>
+                                                <Text fontSize={{md: 12, base: 10}} ml={5}>
                                                     last updated: {item?.updated_at?.split("T")[0]}
                                                 </Text>
                                             </Flex>
@@ -198,6 +202,15 @@ function UserName (props: any) {
                             }
                         </Grid>
                     </Box>
+                        :
+                        <SkeletonTheme baseColor="#755c7d" highlightColor="#948d96" duration={1} enableAnimation>
+                            <Box w={"100%"} pt={"45px"} p={{md:5,base:2}}>
+                                <Box mt={"50px"}>
+                                    <Skeleton height={270} width={"100%"} borderRadius={16}/>
+                                </Box>
+                            </Box>
+                        </SkeletonTheme>
+                    }
 
 
                     <Box mb={{base:10,md:0}}>
@@ -206,6 +219,7 @@ function UserName (props: any) {
                             nextLabel={">>"}
                             breakLabel={"..."}
                             pageCount={pageCount}
+                            forcePage={currentPage-1}
                             marginPagesDisplayed={2}
                             pageRangeDisplayed={3}
                             onPageChange={handlePageClick}
@@ -231,14 +245,14 @@ export async function getServerSideProps(ctx: any) {
     let userRepo: any = []
     let userInfo: any = {}
     let responseError: any = ""
-
+    // get user info
     await axiosInstance.get(`users/${userName}`)
         .then(res => {
             userInfo = res.data
         })
         .catch(err => responseError = 'User not found')
-
-    await axiosInstance.get(`users/${userName}/repos?sort=created&direction=desc&per_page=6&page=${page || 1}`)
+    // get user repositories list
+    await axiosInstance.get(`users/${userName}/repos?sort=updated&direction=desc&per_page=6&page=${page || 1}`)
         .then(res => {
             userRepo = res.data
         })
