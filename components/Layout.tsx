@@ -18,7 +18,7 @@ const Layout = ({children}: Props) => {
     const isDark = colorMode === "dark";
 
     return (
-        <Container w={"100%"} maxW={1440} marginX={"auto"} p={5}>
+        <Container w={"100%"} maxW={1440} marginX={"auto"} p={{md:5,base:2}}>
             <VStack >
                 <Flex w="100%">
                     <Heading

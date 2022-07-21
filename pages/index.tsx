@@ -47,7 +47,7 @@ const Home: NextPage = () => {
           router.push(`profile/${res.data?.login}?page=1`)
         })
         .catch(err => {
-          notify("user not found", "error")
+          notify("User not found", "error")
         })
         .finally(()=>setLoading(false))
   }
@@ -55,9 +55,17 @@ const Home: NextPage = () => {
   return (
       <Layout>
         <Flex flexDir={"column"} w={"100%"}  >
-          <Text mt={70}  className={styles.gradientText}>Search for GitHub</Text>
-          <Flex gap={5} mt={200}>
-            <Input placeholder='Username' borderColor={"#9a21d9"} size='lg' value={value} onChange={(e) => onChangeHandler(e)}/>
+          <Text mt={70}  className={styles.gradientText} fontSize={{md:"65px",base:"40px"}}>Search for GitHub</Text>
+          <Flex gap={5} mt={200} flexDir={{base:"column",md:"row"}} alignItems={{base:"center"}}>
+            <Input placeholder='Username'
+                   borderColor={"#9a21d9"}
+                   size='lg' value={value}
+                   onChange={(e) => onChangeHandler(e)}
+                   onKeyPress={(e) => {
+                       if (e.which == 13) {
+                           checkUserExist()
+                       }
+                   }}/>
             <Button onClick={checkUserExist}
                     w={"100%"}
                     maxW={256}

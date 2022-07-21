@@ -1,6 +1,6 @@
 import { toast,Slide } from 'react-toastify';
 
-// react toastify for show alert
+// react toastify for show notifications
 
 
 // @ts-ignore
