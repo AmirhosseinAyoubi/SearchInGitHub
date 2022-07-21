@@ -1,0 +1,22 @@
+.paginationJustifyContentCenter{
+  display: flex;
+  width: 100%;
+  gap: 16px;
+  justify-content: center;
+  margin-top: 40px;
+  list-style-type: none;
+  align-items: center;
+}
+.pageItem{
+  background-color: rgba(106, 97, 108, 0.81);
+  width: 36px;
+  height: 36px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 8px;
+}
+.active{
+  background-color: #ab3fc4;
+  border: 2px solid #4a4a9f;
+}
