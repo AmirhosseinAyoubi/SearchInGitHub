@@ -237,7 +237,7 @@ export async function getServerSideProps(ctx: any) {
         })
         .catch(err => responseError = 'User not found')
 
-    await axiosInstance.get(`users/${userName}/repos?sort=created&direction=desc&per_page=6&page=${page || 1}`)
+    await axiosInstance.get(`users/${userName}/repos?sort=updated&direction=desc&per_page=6&page=${page || 1}`)
         .then(res => {
             userRepo = res.data
         })
